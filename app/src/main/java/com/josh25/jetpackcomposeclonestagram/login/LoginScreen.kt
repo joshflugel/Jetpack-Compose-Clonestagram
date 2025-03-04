@@ -1,4 +1,4 @@
-package com.josh25.jetpackcomposeclonestagram
+package com.josh25.jetpackcomposeclonestagram.login
 
 import android.util.Log
 import android.util.Patterns
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +31,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -44,24 +43,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.josh25.jetpackcomposeclonestagram.R
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(modifier: Modifier = Modifier, loginViewModel: LoginViewModel) {
     Box(modifier
         .fillMaxSize()
         .padding(top = 30.dp, start = 10.dp, end = 10.dp)) {
         Header(Modifier.align(Alignment.TopEnd))
-        Body(Modifier.align(Alignment.Center))
+        Body(Modifier.align(Alignment.Center), loginViewModel)
         Footer(Modifier.align(Alignment.BottomCenter))
     }
 }
 
-
 @Composable
-fun Body(modifier: Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var isLoginEnabled by rememberSaveable { mutableStateOf(false) }
+fun Body(modifier: Modifier, loginViewModel: LoginViewModel) {
+    // Refactored to VM:
+    // var email by rememberSaveable { mutableStateOf("") }
+    // var password by rememberSaveable { mutableStateOf("") }
+    // var isLoginEnabled by rememberSaveable { mutableStateOf(false) }
+
+    val email:String by loginViewModel.email.observeAsState(initial = "")
+    val password:String by loginViewModel.password.observeAsState(initial = "")
+    val isLoginEnabled by loginViewModel.isLoginEnabled.observeAsState(initial = false)
 
     Column(
         modifier = modifier//.fillMaxSize().imePadding()
@@ -69,16 +73,12 @@ fun Body(modifier: Modifier) {
         ImageLogo(Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.size(16.dp))
         Email(email) {
-            email = it
-            isLoginEnabled = enableLogin(email, password)
-            Log.e("joshtag","isLoginEnabled$isLoginEnabled")
+            loginViewModel.onLoginChanged(email = it, password = password)
         }
         Spacer(modifier = Modifier.size(8.dp))
-        Password(password, {
-            password = it
-            isLoginEnabled = enableLogin(email, password)
-            Log.e("joshtag","isLoginEnabled$isLoginEnabled")
-        })
+        Password(password) {
+            loginViewModel.onLoginChanged(email = email, password = it)
+        }
         Spacer(modifier = Modifier.size(8.dp))
         ForgotPassword(Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.size(16.dp))
@@ -176,10 +176,6 @@ fun LoginButton(loginEnabled: Boolean) {
     ) {
         Text("Log In")
     }
-}
-
-fun enableLogin(email: String, password: String):Boolean {
-    return Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length > 6
 }
 
 @Composable

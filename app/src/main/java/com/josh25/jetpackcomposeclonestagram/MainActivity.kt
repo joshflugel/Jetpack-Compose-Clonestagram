@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.josh25.jetpackcomposeclonestagram.login.LoginScreen
+import com.josh25.jetpackcomposeclonestagram.login.LoginViewModel
 import com.josh25.jetpackcomposeclonestagram.ui.theme.JetpackComposeClonestagramTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             JetpackComposeClonestagramTheme(darkTheme = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LoginScreen(Modifier.padding(innerPadding))
+                    LoginScreen(Modifier.padding(innerPadding), LoginViewModel()) // Upgrade to DI up ahead
                 }
             }
         }
