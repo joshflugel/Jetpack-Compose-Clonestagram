@@ -60,4 +60,8 @@ dependencies {
     // ViewModel
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.compose.livedata)
+
+    // Retrofit
+    implementation(libs.squareup.retrofit)
+    implementation(libs.squareup.converter.gson)
 }
